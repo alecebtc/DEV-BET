@@ -1,27 +1,70 @@
 import { useState, type FormEvent } from "react";
 import { User, Lock, LogIn, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { useLanguage } from "@/hooks/use-language";
+import { supabase } from "@/integrations/supabase/client";
 
 export function LoginForm() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [usernameOrEmail, setUsernameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!username.trim() || !password.trim()) {
+    if (!usernameOrEmail.trim() || !password.trim()) {
       toast.error(t("missingFields"));
       return;
     }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    toast.success(`${t("welcomeBack")}, ${username}!`);
-    navigate({ to: "/dashboard" });
+    
+    try {
+      // Check if input is email or username
+      const isEmail = usernameOrEmail.includes("@");
+      let email = usernameOrEmail;
+      
+      if (!isEmail) {
+        // Look up email by username
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("email")
+          .eq("username", usernameOrEmail.toLowerCase())
+          .maybeSingle();
+        
+        if (profileError || !profile) {
+          toast.error("User not found");
+          setLoading(false);
+          return;
+        }
+        email = profile.email;
+      }
+      
+      // Attempt sign in with email
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          toast.error("Wrong password");
+        } else if (error.message.toLowerCase().includes("not found")) {
+          toast.error("User not found");
+        } else {
+          toast.error(error.message);
+        }
+        setLoading(false);
+        return;
+      }
+      
+      toast.success(`${t("welcomeBack")}!`);
+      navigate({ to: "/dashboard" });
+    } catch {
+      toast.error("An error occurred. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,11 +78,11 @@ export function LoginForm() {
             <User className="h-5 w-5 text-primary shrink-0" strokeWidth={2.2} />
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={usernameOrEmail}
+              onChange={(e) => setUsernameOrEmail(e.target.value)}
               placeholder={t("loginPlaceholder")}
               autoComplete="username"
-              maxLength={50}
+              maxLength={100}
               className="w-full bg-transparent text-base text-neutral-800 placeholder:text-neutral-500 focus:outline-none"
               disabled={loading}
             />
@@ -79,6 +122,16 @@ export function LoginForm() {
             </>
           )}
         </button>
+
+        <p className="text-center text-sm text-white/75">
+          {"Don't have an account? "}
+          <Link
+            to="/landing"
+            className="font-semibold text-white underline-offset-4 hover:underline"
+          >
+            Create one
+          </Link>
+        </p>
       </div>
     </form>
   );

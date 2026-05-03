@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { BrandLogo } from "@/components/BrandLogo";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { SignInForm } from "@/components/auth/SignInForm";
-import heroBg from "@/assets/landing-hero.jpg";
+const heroBg = "/images/hero-sports.jpg";
 
 export const Route = createFileRoute("/landing")({
   head: () => ({
