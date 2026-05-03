@@ -72,10 +72,9 @@ export function MatchCard({ match, onPick, activePick }: MatchCardProps) {
             <Tv className="size-3.5 text-accent" aria-label="Live stream" />
           )}
           {match.isLive ? (
-            <span className="flex items-center gap-1 rounded-sm bg-primary/20 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
-              <span className="size-1.5 animate-pulse rounded-full bg-primary" />
-              {match.minute}
-              {t("minute")}
+            <span className="flex items-center gap-1.5 rounded-sm bg-red-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-500">
+              <span className="size-1.5 animate-pulse rounded-full bg-red-500" />
+              LIVE {match.minute}&apos;
             </span>
           ) : (
             <span className="text-[11px] font-medium tabular-nums text-muted-foreground">
