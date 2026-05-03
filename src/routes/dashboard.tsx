@@ -8,8 +8,25 @@ import { MatchCard, type Match } from "@/components/dashboard/MatchCard";
 import { BetSlip, type BetSelection } from "@/components/dashboard/BetSlip";
 import { DepositDialog } from "@/components/dashboard/DepositDialog";
 import { SupportChat } from "@/components/dashboard/SupportChat";
-import { getFootballMatches, type FootballMatch } from "@/server/football.functions";
 import { Radio, Calendar, X, MessageSquare, RefreshCw, AlertCircle } from "lucide-react";
+
+// Type for football match data from API
+interface FootballMatch {
+  id: string;
+  league: string;
+  leagueKey: string;
+  commenceTime: string;
+  homeTeam: string;
+  awayTeam: string;
+  odds: { home: number | null; draw: number | null; away: number | null };
+  live: {
+    inPlay: boolean;
+    completed: boolean;
+    minute: number | null;
+    homeScore: number | null;
+    awayScore: number | null;
+  };
+}
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
