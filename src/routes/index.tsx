@@ -4,7 +4,7 @@ import { LoginForm } from "@/components/LoginForm";
 import { BrandLogo } from "@/components/BrandLogo";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LanguageProvider, useLanguage } from "@/hooks/use-language";
-import heroBg from "@/assets/hero-sports.jpg";
+const heroBg = "/images/hero-sports.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
